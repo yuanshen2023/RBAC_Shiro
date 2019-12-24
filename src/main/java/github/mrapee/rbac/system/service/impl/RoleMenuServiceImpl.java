@@ -1,7 +1,7 @@
 package github.mrapee.rbac.system.service.impl;
 
-import github.mrapee.rbac.system.entity.RoleMenu;
-import github.mrapee.rbac.system.mapper.RoleMenuMapper;
+import github.mrapee.rbac.system.domain.RoleMenu;
+import github.mrapee.rbac.system.dao.RoleMenuMapper;
 import github.mrapee.rbac.system.service.IRoleMenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

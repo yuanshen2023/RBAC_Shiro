@@ -30,13 +30,13 @@ public class CodeGenerator {
     //包的基础路径
     private static final String BASE_PACKAGE_URL = "github.mrapee.rbac";
     //xml文件路径
-    private static final String XML_PACKAGE_URL = "/src/main/resources/mapper/";
+    private static final String XML_PACKAGE_URL = "/src/main/resources/dao/";
     //xml文件模板
-    private static final String XML_MAPPER_TEMPLATE_PATH = "templates/mapper.xml";
+    private static final String XML_MAPPER_TEMPLATE_PATH = "templates/dao.xml";
     //mapper文件模板
-    private static final String MAPPER_TEMPLATE_PATH = "templates/mapper.java";
+    private static final String MAPPER_TEMPLATE_PATH = "templates/dao.java";
     //entity文件模板
-    private static final String ENTITY_TEMPLATE_PATH = "templates/entity.java";
+    private static final String ENTITY_TEMPLATE_PATH = "templates/domain.java";
     //service文件模板
     private static final String SERVICE_TEMPLATE_PATH = "templates/service.java";
     //serviceImpl文件模板
@@ -105,7 +105,7 @@ public class CodeGenerator {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 //自定义输出文件名
-                return projectPath + "/rbac/src/main/resources/mapper/" + pc.getModuleName()
+                return projectPath + "/rbac/src/main/resources/dao/" + pc.getModuleName()
                         + "/" + tableInfo.getEntityName() + "Mapper" + StringPool.DOT_XML;
             }
         });

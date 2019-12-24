@@ -4,3 +4,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: cfes123**
+
+mybatis-plus:
+  type-aliases-package: github.mrapee.rbac.system.domain
+  mapper-locations: classpath:mapper/*/*.xml
+  configuration:
+    jdbc-type-for-null: null
+  global-config:
+    banner: false

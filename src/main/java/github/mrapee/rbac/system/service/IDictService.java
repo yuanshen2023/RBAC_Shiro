@@ -1,6 +1,6 @@
 package github.mrapee.rbac.system.service;
 
-import github.mrapee.rbac.system.entity.Dict;
+import github.mrapee.rbac.system.domain.Dict;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

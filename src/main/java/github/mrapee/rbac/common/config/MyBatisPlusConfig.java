@@ -1,6 +1,7 @@
 package github.mrapee.rbac.common.config;
 
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * @create: 2019-12-23 14:32
  **/
 @Configuration
+@MapperScan("github.mrapee.rbac.*.dao")
 public class MyBatisPlusConfig {
     /**
     *@Description: 分页插件

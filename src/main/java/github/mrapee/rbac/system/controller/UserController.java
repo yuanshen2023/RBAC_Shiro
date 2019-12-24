@@ -1,30 +1,30 @@
 package github.mrapee.rbac.system.controller;
 
-
-import com.mysql.cj.QueryResult;
 import github.mrapee.rbac.common.controller.BaseController;
-import github.mrapee.rbac.system.entity.User;
+import github.mrapee.rbac.common.domain.QueryRequest;
+import github.mrapee.rbac.system.domain.User;
 import github.mrapee.rbac.system.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
 import java.util.Map;
 
 /**
 * @author MrApee
 */
 @RestController
-@RequestMapping("/system/user")
+@RequestMapping("user")
 public class UserController extends BaseController {
+
+    private IUserService userService;
     @Autowired
-    public IUserService userService;
+    public UserController(IUserService userService){
+        this.userService = userService;
+    }
 
     @GetMapping
-    public Map<String,Object> userList(QueryResult queryResult, User user){
-        return new HashMap<>();
+    public Map<String,Object> userList(QueryRequest queryRequest, User user){
+        return getDataTable(userService.findUserDetail(user,queryRequest));
     }
 }

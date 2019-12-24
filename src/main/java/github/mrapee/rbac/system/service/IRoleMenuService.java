@@ -1,6 +1,6 @@
 package github.mrapee.rbac.system.service;
 
-import github.mrapee.rbac.system.entity.RoleMenu;
+import github.mrapee.rbac.system.domain.RoleMenu;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

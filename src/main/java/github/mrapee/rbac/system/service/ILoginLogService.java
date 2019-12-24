@@ -1,6 +1,6 @@
 package github.mrapee.rbac.system.service;
 
-import github.mrapee.rbac.system.entity.LoginLog;
+import github.mrapee.rbac.system.domain.LoginLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

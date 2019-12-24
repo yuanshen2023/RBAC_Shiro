@@ -1,8 +1,7 @@
 package github.mrapee.rbac.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import github.mrapee.rbac.system.entity.User;
-import github.mrapee.rbac.system.entity.UserConfig;
+import github.mrapee.rbac.system.domain.User;
 import github.mrapee.rbac.system.service.IUserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,8 +11,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
