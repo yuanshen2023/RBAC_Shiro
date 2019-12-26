@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
 *@author:MrApee
@@ -65,41 +67,108 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId,user.getUserId()));
 
         String[] roles = user.getRoleId().split(StringPool.COMMA);
-        //setUserRoles(user,roles);
+        setUserRoles(user,roles);
+
+        //重新将用户信息，用户角色信息，用户权限信息，加载到redis中
     }
 
     @Override
     public void createUser(User user) throws Exception {
+        //创建用户
+        user.setAvatar(User.DEFAULT_AVATAR);
+        user.setPassword(User.DEFAULT_PASSWORD);
+        user.setCreateTime(LocalDateTime.now());
+        save(user);
+
+        //保存用户角色
+        String[] roles = user.getRoleId().split(StringPool.COMMA);
+        setUserRoles(user,roles);
+
+        //创建用户默认的个性化配置
+
+
+        //将用户相关信息保存到Redis中
 
     }
 
     @Override
     public void deleteUsers(String[] userIds) throws Exception {
+        //先删除相应的缓存
+
+        List<String> list = Arrays.asList(userIds);
+        removeByIds(list);
+
+        //删除用户角色
+        this.userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId,userIds));
+        //删除用户个性化配置
 
     }
 
     @Override
     public void updateProfile(User user) throws Exception {
+        updateById(user);
+        //重新缓存用户信息
 
     }
 
     @Override
     public void updateAvatar(String username, String avatar) throws Exception {
+        User user = new User();
+        user.setAvatar(avatar);
+        update(user,new LambdaQueryWrapper<User>().eq(User::getUsername,username));
+        //重新缓存用户信息
 
     }
 
     @Override
     public void updatePassword(String username, String password) throws Exception {
+        User user = new User();
+        user.setPassword(password);
+        update(user,new LambdaQueryWrapper<User>().eq(User::getUsername,username));
+        //重新缓存用户信息
 
     }
 
     @Override
     public void regist(String username, String password) throws Exception {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setCreateTime(LocalDateTime.now());
+        user.setAvatar(User.DEFAULT_AVATAR);
+        user.setStatus(User.STATUS_VALID);
+        user.setSsex(User.SEX_UNKNOWN);
+        user.setDescription("注册用户");
+        this.save(user);
+
+        //添加用户角色信息
+        UserRole ur = new UserRole();
+        ur.setUserId(user.getUserId());
+        ur.setRoleId(2L);//注册用户角色ID
+        this.userRoleMapper.insert(ur);
+
+        //创建用户默认的个性化配置
+
+        //将用户相关信息保存到Redis中
 
     }
 
     @Override
     public void resetPassword(String[] usernames) throws Exception {
+        User user = new User();
+        user.setPassword(User.DEFAULT_PASSWORD);
+        update(user,new LambdaQueryWrapper<User>().eq(User::getUsername,usernames));
 
+        //重新将用户信息加载到Redis中
+
+    }
+
+    private void setUserRoles(User user,String[] roleIds){
+        Arrays.stream(roleIds).forEach(roleId -> {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(user.getUserId());
+            userRole.setRoleId(Long.parseLong(roleId));
+            this.userRoleMapper.insert(userRole);
+        });
     }
 }
