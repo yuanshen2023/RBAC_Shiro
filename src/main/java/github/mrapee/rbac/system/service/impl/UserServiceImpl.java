@@ -9,6 +9,7 @@ import github.mrapee.rbac.system.dao.UserRoleMapper;
 import github.mrapee.rbac.system.domain.User;
 import github.mrapee.rbac.system.dao.UserMapper;
 import github.mrapee.rbac.system.domain.UserRole;
+import github.mrapee.rbac.system.service.IUserConfigService;
 import github.mrapee.rbac.system.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +28,15 @@ import java.util.List;
 @Service("userService")
 public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUserService{
 
+    private UserRoleMapper userRoleMapper;
+    private IUserConfigService userConfigService;
+
+
     @Autowired
-    UserRoleMapper userRoleMapper;
+    public UserServiceImpl(UserRoleMapper userRoleMapper,IUserConfigService userConfigService){
+        this.userRoleMapper = userRoleMapper;
+        this.userConfigService = userConfigService;
+    }
 
     @Override
     public User findByName(String username) {
@@ -64,6 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         user.setPassword(null);
         user.setModifyTime(LocalDateTime.now());
         updateById(user);
+        userRoleMapper.deleteByUserId(user.getUserId());
         userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId,user.getUserId()));
 
         String[] roles = user.getRoleId().split(StringPool.COMMA);
@@ -73,11 +82,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
     }
 
     @Override
+    @Transactional
     public void createUser(User user) throws Exception {
         //创建用户
         user.setAvatar(User.DEFAULT_AVATAR);
         user.setPassword(User.DEFAULT_PASSWORD);
         user.setCreateTime(LocalDateTime.now());
+        user.setStatus(User.STATUS_VALID);
         save(user);
 
         //保存用户角色
@@ -85,13 +96,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         setUserRoles(user,roles);
 
         //创建用户默认的个性化配置
-
+        userConfigService.initDefaultUserConfig(String.valueOf(user.getUserId()));
 
         //将用户相关信息保存到Redis中
 
     }
 
     @Override
+    @Transactional
     public void deleteUsers(String[] userIds) throws Exception {
         //先删除相应的缓存
 
@@ -99,12 +111,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         removeByIds(list);
 
         //删除用户角色
-        this.userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId,userIds));
+        this.userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().in(UserRole::getUserId,userIds));
         //删除用户个性化配置
-
+        userConfigService.deleteByUserId(userIds);
     }
 
     @Override
+    @Transactional
     public void updateProfile(User user) throws Exception {
         updateById(user);
         //重新缓存用户信息
@@ -112,6 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
     }
 
     @Override
+    @Transactional
     public void updateAvatar(String username, String avatar) throws Exception {
         User user = new User();
         user.setAvatar(avatar);
@@ -121,6 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
     }
 
     @Override
+    @Transactional
     public void updatePassword(String username, String password) throws Exception {
         User user = new User();
         user.setPassword(password);
@@ -130,6 +145,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
     }
 
     @Override
+    @Transactional
     public void regist(String username, String password) throws Exception {
         User user = new User();
         user.setUsername(username);
@@ -148,19 +164,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         this.userRoleMapper.insert(ur);
 
         //创建用户默认的个性化配置
-
+        userConfigService.initDefaultUserConfig(String.valueOf(user.getUserId()));
         //将用户相关信息保存到Redis中
 
     }
 
     @Override
+    @Transactional
     public void resetPassword(String[] usernames) throws Exception {
-        User user = new User();
-        user.setPassword(User.DEFAULT_PASSWORD);
-        update(user,new LambdaQueryWrapper<User>().eq(User::getUsername,usernames));
+        Arrays.stream(usernames).forEach(username -> {
+            User user = new User();
+            user.setPassword(User.DEFAULT_PASSWORD);
+            this.baseMapper.update(user,new LambdaQueryWrapper<User>().eq(User::getUsername,username));
+            //重新将用户信息加载到Redis中
 
-        //重新将用户信息加载到Redis中
-
+        });
     }
 
     private void setUserRoles(User user,String[] roleIds){

@@ -65,4 +65,29 @@ public class UserServiceTest {
         System.err.println(userService.removeByMap(map));
     }
 
+    @Test
+    public void createUser() throws Exception{
+        User user = new User();
+        user.setUsername("test2");
+        user.setEmail("1104357019@qq.com");
+        user.setDescription("测试用户");
+        user.setRoleName("测试用户");
+        user.setRoleId("1");
+        userService.createUser(user);
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void deleteUsers() throws Exception{
+        String[] ids = {"11","14","15"};
+        userService.deleteUsers(ids);
+    }
+
+    @Test
+    public void resetPassword() throws Exception{
+        String[] usernames = {"test","test1","test2"};
+        userService.resetPassword(usernames);
+    }
+
 }
