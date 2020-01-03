@@ -87,6 +87,16 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>spring-boot-starter-log4j</artifactId>
         </dependency>
+        <!--集成Redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!--Redis客户端——Jedis-->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
 
     </dependencies>
 

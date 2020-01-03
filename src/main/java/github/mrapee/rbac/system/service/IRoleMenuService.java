@@ -8,4 +8,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface IRoleMenuService extends IService<RoleMenu>{
 
+    void deleteByRoleIds(String[] roleIds);
+
 }

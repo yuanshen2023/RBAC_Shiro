@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="github.mrapee.rbac.system.dao.RoleMapper">
+    <resultMap id="BaseResultMap" type="github.mrapee.rbac.system.domain.Role">
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
 
+    <!--根据用户名查询用户角色-->
+    <select id="findByUsername" resultType="Role">
+        SELECT r.role_id roleId,
+               r.role_name roleName,
+               r.remark,
+               r.create_time createTime,
+               r.modify_time modifyTime
+        FROM t_role r
+        LEFT JOIN t_user_role ur ON r.role_id = ur.role_id
+        LEFT JOIN t_user u ON ur.user_id = u.user_id
+        WHERE u.username = #{username}
+
+    </select>
 </mapper>
